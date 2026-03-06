@@ -114,19 +114,19 @@ async function startServer() {
   });
 
   app.post("/api/readings", (req, res) => {
-    const { customer_name, customer_id, pea_meter_no, reading_month, reading_year, image_base64, data } = req.body;
-    console.log(`POST /api/readings: ${customer_name}, image length: ${image_base64?.length || 0}`);
+    const { customer_name, customer_id, pea_meter_no, reading_month, reading_year, data } = req.body;
+    console.log(`POST /api/readings: ${customer_name} (No image saved per request)`);
     
     if (!customer_name || !customer_id || !pea_meter_no) {
       return res.status(400).json({ error: "กรุณากรอกข้อมูลพื้นฐานให้ครบถ้วน (ชื่อ, ID, หมายเลขมิเตอร์)" });
     }
 
     const query = `
-      INSERT INTO readings (customer_name, customer_id, pea_meter_no, reading_month, reading_year, image_base64, data)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO readings (customer_name, customer_id, pea_meter_no, reading_month, reading_year, data)
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
     
-    db.run(query, [customer_name, customer_id, pea_meter_no, reading_month, reading_year, image_base64, JSON.stringify(data || {})], function(err) {
+    db.run(query, [customer_name, customer_id, pea_meter_no, reading_month, reading_year, JSON.stringify(data || {})], function(err) {
       if (err) {
         console.error("POST /api/readings error:", err.message);
         return res.status(500).json({ error: err.message });
@@ -159,8 +159,8 @@ async function startServer() {
     if (isNaN(id)) {
       return res.status(400).json({ error: "ID ไม่ถูกต้อง" });
     }
-    const { customer_name, customer_id, pea_meter_no, reading_month, reading_year, image_base64, data } = req.body;
-    console.log(`PUT /api/readings/${id}: ${customer_name}, image length: ${image_base64?.length || 0}`);
+    const { customer_name, customer_id, pea_meter_no, reading_month, reading_year, data } = req.body;
+    console.log(`PUT /api/readings/${id}: ${customer_name} (No image saved per request)`);
     
     if (!customer_name || !customer_id || !pea_meter_no) {
       return res.status(400).json({ error: "กรุณากรอกข้อมูลพื้นฐานให้ครบถ้วน" });
@@ -168,11 +168,11 @@ async function startServer() {
 
     const query = `
       UPDATE readings 
-      SET customer_name = ?, customer_id = ?, pea_meter_no = ?, reading_month = ?, reading_year = ?, image_base64 = ?, data = ?
+      SET customer_name = ?, customer_id = ?, pea_meter_no = ?, reading_month = ?, reading_year = ?, data = ?
       WHERE id = ?
     `;
     
-    db.run(query, [customer_name, customer_id, pea_meter_no, reading_month, reading_year, image_base64, JSON.stringify(data || {}), id], function(err) {
+    db.run(query, [customer_name, customer_id, pea_meter_no, reading_month, reading_year, JSON.stringify(data || {}), id], function(err) {
       if (err) {
         console.error("PUT /api/readings error:", err.message);
         return res.status(500).json({ error: err.message });

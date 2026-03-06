@@ -208,10 +208,13 @@ export default function App() {
       const url = isEditing ? `/api/readings/${formData.id}` : '/api/readings';
       const method = isEditing ? 'PUT' : 'POST';
       
+      // Exclude image_base64 from the data sent to the server as requested
+      const { image_base64, ...dataToSave } = formData;
+      
       const res = await fetch(url, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(dataToSave)
       });
       
       if (res.ok) {
