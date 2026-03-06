@@ -49,13 +49,13 @@ const db = new sqlite3.Database(path.join(__dirname, "meter_readings.db"), (err)
   }
 });
 
+const app = express();
+const PORT = 3000;
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
 async function startServer() {
-  const app = express();
-  const PORT = 3000;
-
-  app.use(express.json({ limit: '50mb' }));
-  app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
   // Health check
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", db: !!db });
@@ -216,5 +216,8 @@ async function startServer() {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
+
+// Export app for Vercel
+export default app;
 
 startServer();

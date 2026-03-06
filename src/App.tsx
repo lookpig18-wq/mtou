@@ -20,7 +20,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ReadingData, MeterData, MONTHS_TH } from './types';
 import * as XLSX from 'xlsx';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+// Removed global ai initialization to ensure it uses the latest key and handles missing keys gracefully
+// const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 export default function App() {
   const [view, setView] = useState<'home' | 'scan' | 'history' | 'detail' | 'report'>('home');
@@ -122,6 +123,14 @@ export default function App() {
   };
 
   const extractDataFromImage = async (base64: string) => {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error("GEMINI_API_KEY is missing. Please set it in your environment variables.");
+      alert("ไม่พบ API Key สำหรับการวิเคราะห์รูปภาพ กรุณาตั้งค่า GEMINI_API_KEY ใน Environment Variables ของ Vercel");
+      return null;
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
     const prompt = `
       You are an expert at reading PEA TOU meter reading sheets (ใบอ่านหน่วยไฟฟ้า). 
       Extract the following basic information from the top of the sheet:
